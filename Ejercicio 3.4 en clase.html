@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Quiz de Esfera, Corte 2</title>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; }
+      #info {
+          position: absolute;
+          padding: 10px;
+          width: 100%;
+          text-align: left;
+          color: #ffffff;
+      }
+	  
+    </style>
+  </head>
+  <body>
+    <div id="info">Quiz 3.4. Esfera<br/>     
+		<br/>
+        - Tecla Arriba = Escala X<br/>
+        - Tecla Abajo = Escala Y<br/>
+        - Tecla izquierda = Escala Z<br/>
+		Maycol Santiago Garcia Tovar.<br/>
+		Codigo: 6000364.<br/>
+    </div>
+    <script src="js/three.min.js"></script>
+    <script>
+		var scene, aspect, camera, renderer;
+		var startTime = Date.now();	
+
+        var teclaArriba = false;
+        var teclaAbajo = false;
+        var teclaIzq = false;
+
+        init();
+		animate();
+	
+		function init(){
+			//INICIALIZACIÓN DE LA ESCENA
+			scene = new THREE.Scene();
+			aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.PerspectiveCamera( 45, aspect, 0.1, 1000);
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+				  			
+            var onKeyDown = function ( event ) {
+				switch ( event.keyCode ) {
+					case 38: 
+						teclaArriba = true;
+						break;
+					case 40: 
+						teclaAbajo = true;
+						break;
+					case 37: 
+						teclaIzq = true;
+						break;
+				}
+			};	  
+		  			
+			var onKeyUp = function ( event ) {
+				teclaM = false;
+				teclaN = false;
+				teclaB = false;
+			};	  	
+			
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
+			
+
+	    //ELEMENTOS DE ESCENA
+		var size = 10;
+		var arrowSize = 5;
+		var divisions = size;
+		var origin = new THREE.Vector3( 0, 0, 0 );
+		var x = new THREE.Vector3( 1, 0, 0 );
+		var y = new THREE.Vector3( 0, 1, 0 );
+		var z = new THREE.Vector3( 0, 0, 1 );
+		var color1 = new THREE.Color( 0x008F39 );
+		var color2 = new THREE.Color( 0x333333 );
+		var colorR = new THREE.Color( 0xAA3333 );
+		var colorG = new THREE.Color( 0x33AA33 );
+		var colorB = new THREE.Color( 0x333366 );
+		var grado = -0.7853;
+
+		//CREAR LAS GRILLAS PARA EL ESCENARIO
+		var axesHelper = new THREE.AxesHelper( size );
+		var gridHelperXY = new THREE.GridHelper( size, divisions, color1, color1);
+		var gridHelperXZ = new THREE.GridHelper( size, divisions, color2, color2 );
+		var gridHelperYZ = new THREE.GridHelper( size, divisions, color2, color2 );
+            
+      //ROTARLAS PARA QUE QUEDEN EN EL ESPACIO ADECUADO
+      gridHelperXY.rotateOnWorldAxis ( x, THREE.Math.degToRad(90) );
+      gridHelperXZ.rotateOnWorldAxis ( y, THREE.Math.degToRad(90) );
+      gridHelperYZ.rotateOnWorldAxis ( z, THREE.Math.degToRad(90) );
+            
+      //CREAR LAS FLECHAS QUE INDICAN LOS EJES DE COORDENADAS 3D
+      var arrowX = new THREE.ArrowHelper( x, origin, arrowSize, colorR );
+      var arrowY = new THREE.ArrowHelper( y, origin, arrowSize, colorG );
+      var arrowZ = new THREE.ArrowHelper( z, origin, arrowSize, colorB );
+			
+      //Geometria
+      var geometry = new THREE.SphereGeometry(1, 10, 10);
+      //METERIAL
+      var material = new THREE.MeshBasicMaterial( {color: 0x42FFB0} );
+      //OBJETO
+      var Sphere  = new THREE.Mesh( geometry, material );
+
+      //Variable Rotar tiene una matriz que le devuelve matrizR
+      /*
+      var Escala = matrizEscala();
+      var Trasla = matrizTrasla();
+
+      //En orden de aplicacion de Matrices
+      
+      Sphere.applyMatrix(Escala);
+      Sphere.applyMatrix(Trasla);
+     
+     */
+      
+		//AGREGAR A LA ESCENA
+        scene.add( gridHelperXZ );
+	    scene.add( arrowX );	
+	    scene.add( arrowY );	
+	    scene.add( arrowZ );	
+        scene.add( Sphere );
+			
+		//MOVER LA CÁMARA
+		camera.position.x = 5;
+		camera.position.y = 8;	 
+		camera.position.z = 8;			
+		camera.lookAt( origin );
+		}
+      
+/*
+      //Matriz que pone la figura en el centro
+      function matrizTrasla(){
+      var sx = 0, sy = 0, sz = 0;
+
+      if(teclaIzq){
+        sz = 2.8;
+       }
+      var MatrizT = new THREE.Matrix4();
+
+        MatrizT.set(1, 0, 0, sx,
+                    0, 1, 0, sy,
+                    0, 0, 1, sz,
+                    0, 0, 0, 1);
+
+        return MatrizT;
+        object.elementsNeedUpdate = true;
+      } 
+      */
+/*
+      //Matriz que escala la figura
+      function matrizEscala(){
+      var sx = 0.5, sy = 0.5, sz = 3;
+      var matrizescala = new THREE.Matrix4();
+
+        matrizescala.set(sx, 0, 0, 0,
+                        0, sy, 0, 0,
+                        0, 0, sz, 0,
+                        0, 0, 0, 1);
+
+        return matrizescala;   
+      }
+*/
+    function animate() {
+        render();
+        requestAnimationFrame( animate );
+    }
+
+    
+    function render(){
+        var dtime = Date.now()-startTime;
+        camera.lookAt( 0, 0, 0 );
+        camera.position.x = 10 * Math.cos(dtime / 10000);
+        camera.position.z = 10 * Math.sin(dtime / 10000);
+        renderer.render( scene, camera );
+    }
+    </script>
+  </body>
+</html> 
